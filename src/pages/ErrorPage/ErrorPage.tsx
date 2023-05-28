@@ -1,4 +1,5 @@
 import React from "react";
+import { Typography } from "@mui/material";
 import { useRouteError } from "react-router-dom";
 
 export const ErrorPage = () => {
@@ -6,12 +7,16 @@ export const ErrorPage = () => {
   console.error(error);
 
   return (
-    <div id="error-page">
-      <h1>Oops!</h1>
-      <p>Sorry, an unexpected error has occurred.</p>
-      <p>
+    <>
+      <Typography variant="h2" component="h2" paddingX={2} width={"80%"} marginX={"auto"}>
+        Oops!
+      </Typography>
+      <Typography variant="h4" component="h3" paddingX={2} width={"80%"} marginX={"auto"}>
+        Sorry, an unexpected error has occurred.
+      </Typography>
+      <Typography variant="body1" component="p" paddingX={2} width={"80%"} marginX={"auto"}>
         <i>{(error as Error)?.message || (error as { statusText?: string })?.statusText}</i>
-      </p>
-    </div>
+      </Typography>
+    </>
   );
 };
