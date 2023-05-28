@@ -11,20 +11,33 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { AutocompleteBaseProps, IOption } from "./types";
 
-export interface AutocompleteMultiProps extends AutocompleteBaseProps {
-  selectedValue: IOption[];
-  setSelectedValue: React.Dispatch<React.SetStateAction<IOption[]>>;
+export interface AutocompleteBaseProps {
+  label: string;
+  placeholder: string;
+  searchQuery: (value: string) => Promise<IOption[]>;
 }
 
-export const AutocompleteMulti = ({
+export interface IOption {
+  id: string;
+  name: string;
+  image?: string;
+}
+
+export interface AutocompleteCustomProps extends AutocompleteBaseProps {
+  multi?: boolean;
+  selectedValue: IOption | null | IOption[];
+  setSelectedValue: React.Dispatch<React.SetStateAction<IOption | null | IOption[]>>;
+}
+
+export const AutocompleteCustom = ({
   label,
   placeholder,
   searchQuery,
   selectedValue,
   setSelectedValue,
-}: AutocompleteMultiProps) => {
+  multi,
+}: AutocompleteCustomProps) => {
   const [inputValue, setInputValue] = useState<string>("");
   const [options, setOptions] = useState<IOption[]>([]);
   const [isLoading, setLoading] = useState<boolean>(false);
@@ -36,10 +49,14 @@ export const AutocompleteMulti = ({
   };
 
   const handleChange = (option: IOption) => {
-    if (selectedValue.find((opt) => opt.id === option.id)) {
-      setSelectedValue(selectedValue.filter((opt) => opt.id !== option.id));
+    if (multi) {
+      if ((selectedValue as IOption[]).find((opt) => opt.id === option.id)) {
+        setSelectedValue((selectedValue as IOption[]).filter((opt) => opt.id !== option.id));
+      } else {
+        setSelectedValue([...(selectedValue as IOption[]), option]);
+      }
     } else {
-      setSelectedValue([...selectedValue, option]);
+      setSelectedValue(option);
     }
   };
 
@@ -52,8 +69,8 @@ export const AutocompleteMulti = ({
 
   return (
     <Autocomplete
-      multiple
-      value={selectedValue}
+      multiple={multi}
+      value={multi ? (selectedValue as IOption[]) : (selectedValue as IOption | null)}
       options={options}
       getOptionLabel={(option) => option.name}
       filterSelectedOptions
@@ -62,15 +79,21 @@ export const AutocompleteMulti = ({
       }}
       onChange={(
         _event: React.SyntheticEvent<Element, Event>,
-        _value: IOption[],
+        _value: IOption | null | IOption[],
         reason: AutocompleteChangeReason,
         details?: AutocompleteChangeDetails<IOption> | undefined
       ) => {
-        if (reason === "removeOption") {
-          setSelectedValue(selectedValue.filter((opt) => opt.id !== details?.option?.id));
-        }
-        if (reason === "clear") {
-          setSelectedValue([]);
+        if (multi) {
+          if (reason === "removeOption") {
+            setSelectedValue((selectedValue as IOption[]).filter((opt) => opt.id !== details?.option?.id));
+          }
+          if (reason === "clear") {
+            setSelectedValue([]);
+          }
+        } else {
+          if (reason === "clear") {
+            setSelectedValue(null);
+          }
         }
       }}
       renderTags={(value: readonly IOption[], getTagProps) =>

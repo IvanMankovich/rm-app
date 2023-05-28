@@ -4,14 +4,12 @@ import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
 import { Button, CardActions, Divider, TextField } from "@mui/material";
 
-import { AutocompleteMulti } from "../../../components/Autocomplete/AutocompleteMulti";
 import { IOption } from "../../../components/Autocomplete/types";
-import { AutocompleteSingle } from "../../../components/Autocomplete/AutocompleteSingle";
-
 import { ISceneCardProps } from "../Scene";
 
 import { makeRequest } from "../../../utils/utils";
 import { GET_CHARACTERS_BY_NAME, GET_LOCATION_BY_NAME } from "../../../queries/queries";
+import { AutocompleteCustom } from "../../../components/Autocomplete/AutocompleteCustom";
 
 interface ISceneEditContentProps extends ISceneCardProps {
   setEditable: React.Dispatch<React.SetStateAction<boolean>>;
@@ -27,8 +25,8 @@ export const EditCard = ({
   onUpdateScene,
 }: ISceneEditContentProps) => {
   const [descriptionState, setDescriptionState] = useState<string>(description);
-  const [locationState, setLocationState] = useState<IOption | null>(location);
-  const [charactersState, setCharactersState] = useState<IOption[]>(characters);
+  const [locationState, setLocationState] = useState<IOption | null | IOption[]>(location);
+  const [charactersState, setCharactersState] = useState<IOption | null | IOption[]>(characters);
 
   const getLocationsAsync = async (value: string) => {
     const res = await makeRequest(GET_LOCATION_BY_NAME, { name: value });
@@ -65,7 +63,7 @@ export const EditCard = ({
       />
       <Divider />
       <CardContent>
-        <AutocompleteSingle
+        <AutocompleteCustom
           searchQuery={getLocationsAsync}
           label={"Location"}
           placeholder={"Earth (C-137)"}
@@ -75,7 +73,8 @@ export const EditCard = ({
       </CardContent>
       <Divider />
       <CardContent>
-        <AutocompleteMulti
+        <AutocompleteCustom
+          multi
           searchQuery={getCharactersAsync}
           label={"Character"}
           placeholder={"Rick Sanchez"}
@@ -103,7 +102,9 @@ export const EditCard = ({
           variant="contained"
           type="submit"
           sx={{ marginTop: "0.5rem", marginBottom: 0, width: "100%" }}
-          disabled={locationState === null || !charactersState.length || !Boolean(descriptionState?.trim?.())}
+          disabled={
+            locationState === null || !(charactersState as IOption[])?.length || !Boolean(descriptionState?.trim?.())
+          }
         >
           Save
         </Button>

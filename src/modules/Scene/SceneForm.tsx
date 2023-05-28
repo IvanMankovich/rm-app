@@ -2,12 +2,11 @@ import React, { useState } from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
 
 import { IScene } from "./ScenesList";
-import { AutocompleteMulti } from "../../components/Autocomplete/AutocompleteMulti";
-import { AutocompleteSingle } from "../../components/Autocomplete/AutocompleteSingle";
 import { IOption } from "../../components/Autocomplete/types";
 
 import { GET_CHARACTERS_BY_NAME, GET_LOCATION_BY_NAME } from "../../queries/queries";
 import { makeRequest } from "../../utils/utils";
+import { AutocompleteCustom } from "../../components/Autocomplete/AutocompleteCustom";
 
 export interface ISceneFromProps {
   onCreateScene: (scene: IScene) => void;
@@ -16,8 +15,8 @@ export interface ISceneFromProps {
 export const SceneForm = ({ onCreateScene }: ISceneFromProps) => {
   const DEF_VALUE = "";
   const [description, setDescription] = useState<string>(DEF_VALUE);
-  const [location, setLocation] = useState<IOption | null>(null);
-  const [characters, setCharacters] = useState<IOption[]>([]);
+  const [location, setLocation] = useState<IOption | null | IOption[]>(null);
+  const [characters, setCharacters] = useState<IOption | null | IOption[]>([]);
 
   const onSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -64,14 +63,15 @@ export const SceneForm = ({ onCreateScene }: ISceneFromProps) => {
       <Typography variant="body1" component="h5" fontWeight="bold" marginBottom={1}>
         Create new scene
       </Typography>
-      <AutocompleteSingle
+      <AutocompleteCustom
         searchQuery={getLocationsAsync}
         label={"Location"}
         placeholder={"Earth (C-137)"}
         selectedValue={location}
         setSelectedValue={setLocation}
       />
-      <AutocompleteMulti
+      <AutocompleteCustom
+        multi
         searchQuery={getCharactersAsync}
         label={"Character"}
         placeholder={"Rick Sanchez"}
@@ -95,7 +95,7 @@ export const SceneForm = ({ onCreateScene }: ISceneFromProps) => {
         variant="contained"
         type="submit"
         sx={{ marginTop: "0.5rem", marginBottom: 0 }}
-        disabled={location === null || !characters.length || !Boolean(description?.trim?.())}
+        disabled={location === null || !(characters as IOption[])?.length || !Boolean(description?.trim?.())}
       >
         Create scene
       </Button>

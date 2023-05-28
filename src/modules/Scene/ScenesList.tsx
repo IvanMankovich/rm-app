@@ -15,8 +15,8 @@ export interface ILocation {
 
 export interface IScene {
   readonly id: string | number;
-  characters: IOption[];
-  location: IOption | null;
+  characters: IOption | null | IOption[];
+  location: IOption | null | IOption[];
   description: string;
 }
 

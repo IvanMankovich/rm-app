@@ -8,6 +8,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import EditIcon from "@mui/icons-material/Edit";
 import { Box, Chip, Divider } from "@mui/material";
 import { ISceneCardProps } from "../Scene";
+import { IOption } from "../../../components/Autocomplete/AutocompleteCustom";
 
 interface ISceneShowContentProps extends Omit<ISceneCardProps, "onUpdateScene"> {
   setEditable: React.Dispatch<React.SetStateAction<boolean>>;
@@ -46,14 +47,14 @@ export const ShowCard = ({
         <Typography variant="body2" component="h6" color={"#AAA"} marginBottom={1}>
           Location
         </Typography>
-        <Typography variant="body1">{location?.name}</Typography>
+        <Typography variant="body1">{(location as IOption)?.name}</Typography>
       </CardContent>
       <Divider />
       <CardContent>
         <Typography variant="body2" component="h6" color={"#AAA"} marginBottom={1}>
           Characters
         </Typography>
-        {characters?.map?.((ch) => (
+        {(characters as IOption[])?.map?.((ch) => (
           <Chip
             key={ch.id}
             label={ch.name}
